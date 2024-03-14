@@ -17,7 +17,6 @@ const Auth = () => {
   const isLogin = location.pathname === SIGNIN_ROUTE;
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const loading = useSelector(selectLoading);
 
   const click = async () => {
     try {
@@ -27,8 +26,7 @@ const Auth = () => {
       } else {
         response = await dispatch(fetchSignUp({ email, password }));
       }
-      if (!loading) {
-        console.log("Token after login/signup:", localStorage.getItem("token"));
+      if (response.payload) {
         navigate(BUSINESSPAGE_ROUTE);
       }
     } catch (error) {

@@ -22,13 +22,13 @@ const Meetings = sequelize.define("meetings", {
   summary: { type: DataTypes.TEXT },
 });
 
-SalesUsers.hasMany(CompanyBusiness);
+SalesUsers.hasMany(CompanyBusiness, { onDelete: "CASCADE" });
 CompanyBusiness.belongsTo(SalesUsers);
 
-CompanyBusiness.hasMany(Meetings);
+CompanyBusiness.hasMany(Meetings, { onDelete: "CASCADE" });
 Meetings.belongsTo(CompanyBusiness);
 
-SalesUsers.hasMany(Meetings);
+SalesUsers.hasMany(Meetings, { onDelete: "CASCADE" });
 Meetings.belongsTo(SalesUsers);
 
 module.exports = {
