@@ -10,8 +10,10 @@ DB_USER= your user
 DB_PASSWORD=your password
 DB_HOST=localhost
 DB_PORT=5432
-ACCES_TOKEN_SECRET=accesrandomsecretkey5
-SECRET_KEY=randomsecretkey5)
+JWT_ACCESS_SECRET=jwt-secret-key
+JWT_REFRESH_SECRET=jwt-refresh-secret-key
+API_URL=http://localhost:5000
+CLIENT_URL=http://localhost:3000
 7)open pgAdmin4 and create a new DB with name "schedule"
 8)go to the cd "server" folder through the terminal and enter the command "npm start"
 9)make sure that the tables are created in "pgAdmin"
