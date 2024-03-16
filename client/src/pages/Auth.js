@@ -3,12 +3,7 @@ import { Card, Button, Form, Container } from "react-bootstrap";
 import { useLocation, NavLink, useNavigate } from "react-router-dom";
 import { BUSINESSPAGE_ROUTE, SIGNIN_ROUTE, SIGNUP_ROUTE } from "../utils/const";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchSignIn,
-  fetchSignUp,
-  selectLoading,
-} from "../features/Users/apiSlice";
-import { fetchCompanyInfo } from "../features/Business/apiSliceBusiness";
+import { fetchSignIn, fetchSignUp } from "../features/Users/apiSlice";
 
 const Auth = () => {
   const [email, setEmail] = useState("");
@@ -17,6 +12,7 @@ const Auth = () => {
   const isLogin = location.pathname === SIGNIN_ROUTE;
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const isAuth = useSelector((state) => state.auth.isAuth);
 
   const click = async () => {
     try {
@@ -26,13 +22,15 @@ const Auth = () => {
       } else {
         response = await dispatch(fetchSignUp({ email, password }));
       }
-      if (response.payload) {
-        navigate(BUSINESSPAGE_ROUTE);
-      }
     } catch (error) {
       console.error("Authentication error:", error);
     }
   };
+  useEffect(() => {
+    if (isAuth) {
+      navigate(BUSINESSPAGE_ROUTE);
+    }
+  }, [isAuth, navigate]);
 
   return (
     <Container

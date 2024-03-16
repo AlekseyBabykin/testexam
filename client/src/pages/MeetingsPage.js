@@ -26,16 +26,16 @@ const MeetingsPage = () => {
 
   const handleAddMeeting = () => {
     const BusinessCompany = companies.find(
-      (company) => company.id == selectedBusinessCompanyId
+      (company) => company.id === selectedBusinessCompanyId
     );
     dispatch(
       fetchMeetingCreate({
         details: newDetails,
         date: newMeetingDate,
         location: newMeetingLocation,
-        business_name: BusinessCompany.name,
+        business_name: BusinessCompany?.name,
         summary: newMeetingSummary,
-        companyBusinessId: BusinessCompany.id,
+        companyBusinessId: BusinessCompany?.id,
       })
     );
     setNewMeetingDate("");
@@ -52,10 +52,14 @@ const MeetingsPage = () => {
     setSelectedMeetingIndex(index);
     setShowEditModal(true);
   };
+
   useEffect(() => {
-    dispatch(fetchCompanyInfo());
-    dispatch(fetchMeetingsInfo());
+    if (localStorage.getItem("token")) {
+      dispatch(fetchCompanyInfo());
+      dispatch(fetchMeetingsInfo());
+    }
   }, [dispatch]);
+
   return (
     <div className="container mt-5">
       <h1>Meetings Page</h1>
@@ -69,10 +73,10 @@ const MeetingsPage = () => {
                   <Col xs={2}>
                     <h5>{meeting.business_name}</h5>
                   </Col>
-                  <Col xs={1}>
+                  <Col xs={2}>
                     <p>{meeting.details}</p>
                   </Col>
-                  <Col xs={5}>
+                  <Col xs={4}>
                     <p>{meeting.summary}</p>
                   </Col>
                   <Col xs={1}>

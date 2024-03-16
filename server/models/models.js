@@ -22,8 +22,16 @@ const Meetings = sequelize.define("meetings", {
   summary: { type: DataTypes.TEXT },
 });
 
+const TokenTable = sequelize.define("token", {
+  id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+  refreshToken: { type: DataTypes.STRING },
+});
+
 SalesUsers.hasMany(CompanyBusiness, { onDelete: "CASCADE" });
 CompanyBusiness.belongsTo(SalesUsers);
+
+SalesUsers.hasOne(TokenTable, { onDelete: "CASCADE" });
+TokenTable.belongsTo(SalesUsers);
 
 CompanyBusiness.hasMany(Meetings, { onDelete: "CASCADE" });
 Meetings.belongsTo(CompanyBusiness);
@@ -35,4 +43,5 @@ module.exports = {
   SalesUsers,
   CompanyBusiness,
   Meetings,
+  TokenTable,
 };

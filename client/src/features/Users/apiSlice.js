@@ -1,32 +1,14 @@
-// authSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import AuthService from "../../services/AuthService";
 import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-
-// Создаем действие для сохранения токена
-export const setToken = createSlice({
-  name: "auth/setToken",
-  initialState: null,
-  reducers: {
-    setToken(state, action) {
-      return action.payload;
-    },
-  },
-});
+import { API_URL } from "../../http";
 
 export const fetchSignUp = createAsyncThunk(
   "api/fetchSignUp",
   async ({ email, password }) => {
     try {
-      const response = await axios.post(`${apiUrl}/api/user/signup`, {
-        email,
-        password,
-      });
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      return jwtDecode(token);
+      const response = await AuthService.signup(email, password);
+      localStorage.setItem("token", response.data);
     } catch (error) {
       throw error;
     }
@@ -37,69 +19,82 @@ export const fetchSignIn = createAsyncThunk(
   "api/fetchSignIn",
   async ({ email, password }) => {
     try {
-      const response = await axios.post(`${apiUrl}/api/user/signin`, {
-        email,
-        password,
-      });
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      return jwtDecode(token);
+      const response = await AuthService.signin(email, password);
+      localStorage.setItem("token", response.data);
     } catch (error) {
       throw error;
     }
   }
 );
 
+export const UserLogout = createAsyncThunk("api/UserLogout", async () => {
+  try {
+    localStorage.removeItem("token");
+    const response = await AuthService.logout();
+  } catch (e) {
+    console.log(e.response?.data?.message);
+  }
+});
+
+export const UserChekAuth = createAsyncThunk("api/UserChekAuth ", async () => {
+  try {
+    const response = await axios.get(`${API_URL}/user/refresh`, {
+      withCredentials: true,
+    });
+    console.log(response);
+    localStorage.setItem("token", response.data);
+  } catch (e) {
+    console.log(e.response?.data?.message);
+  }
+});
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null,
-    loading: false,
-    error: null,
-    token: null, // Добавляем поле для хранения токена
+    isLoading: false,
+    isAuth: false,
   },
-  reducers: {
-    setUser(state, action) {
-      state.user = action.payload;
-      state.loading = false;
-      state.error = null;
-    },
-    clearUser(state) {
-      state.user = null;
-      state.loading = false;
-      state.error = null;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchSignUp.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(fetchSignUp.fulfilled, (state, action) => {
-      state.user = action.payload;
-      state.loading = false;
-      state.token = action.payload.token; // Сохраняем токен в состоянии
-    });
-    builder.addCase(fetchSignUp.rejected, (state, action) => {
-      state.error = action.error.message;
-      state.loading = false;
-    });
-    builder.addCase(fetchSignIn.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(fetchSignIn.fulfilled, (state, action) => {
-      state.user = action.payload;
-      state.loading = false;
-      state.token = action.payload.token; // Сохраняем токен в состоянии
-    });
-    builder.addCase(fetchSignIn.rejected, (state, action) => {
-      state.error = action.error.message;
-      state.loading = false;
-    });
+    builder
+      .addCase(fetchSignUp.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchSignUp.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isAuth = true;
+      })
+      .addCase(fetchSignUp.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(fetchSignIn.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(fetchSignIn.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isAuth = true;
+      })
+      .addCase(fetchSignIn.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(UserLogout.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isAuth = false;
+      })
+      .addCase(UserLogout.rejected, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(UserChekAuth.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(UserChekAuth.fulfilled, (state) => {
+        state.isLoading = false;
+        state.isAuth = true;
+      })
+      .addCase(UserChekAuth.rejected, (state) => {
+        state.isLoading = false;
+      });
   },
 });
-
-export const { setUser, clearUser } = authSlice.actions;
-
-export const selectLoading = (state) => state.auth.loading;
 
 export default authSlice.reducer;

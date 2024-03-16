@@ -35,8 +35,11 @@ const BusinessPage = () => {
   const handleDeleteCompany = (index) => {
     dispatch(fetchDeleteCompany(companies[index].id));
   };
+
   useEffect(() => {
-    dispatch(fetchCompanyInfo());
+    if (localStorage.getItem("token")) {
+      dispatch(fetchCompanyInfo());
+    }
   }, [dispatch]);
 
   return (

@@ -1,5 +1,4 @@
 import { Nav, Container, Navbar, Button } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import {
   BUSINESSPAGE_ROUTE,
@@ -7,10 +6,17 @@ import {
   MEETINGSTATISTICPAGE_ROUTE,
   SIGNIN_ROUTE,
 } from "../utils/const";
-import MeetingStatisticsPage from "../pages/MeetingStatisticsPage";
+
+import { UserLogout } from "../features/Users/apiSlice";
+import { useDispatch } from "react-redux";
 
 const NavBar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(UserLogout());
+  };
 
   return (
     <Navbar bg="dark" data-bs-theme="dark">
@@ -23,10 +29,7 @@ const NavBar = () => {
         </Nav>
         <Nav className="ms-auto">
           <Nav.Link href={SIGNIN_ROUTE}>Signin-Signup</Nav.Link>
-          <Nav.Link
-            href={SIGNIN_ROUTE}
-            onClick={() => localStorage.removeItem("token")}
-          >
+          <Nav.Link href={SIGNIN_ROUTE} onClick={handleLogout}>
             EXIT
           </Nav.Link>
         </Nav>

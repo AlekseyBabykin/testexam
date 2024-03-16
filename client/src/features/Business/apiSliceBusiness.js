@@ -1,23 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import $api from "../../http";
 
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-const token = localStorage.getItem("token");
+// const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
+// const token = localStorage.getItem("token");
 
-const salesUserId = token ? jwtDecode(token).id : null;
+// const salesUserId = token ? jwtDecode(token).id : null;
 
-const headers = token ? { Authorization: `Bearer ${token}` } : {};
+// const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
 export const fetchCompanyInfo = createAsyncThunk(
   "api/fetchCompanyInfo",
   async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/company/info`, {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await $api.get("/company/info");
       return response.data;
     } catch (error) {
       throw error;
@@ -29,15 +26,10 @@ export const fetchCompanyCreate = createAsyncThunk(
   "api/fetchCompanyCreate",
   async ({ name, info }) => {
     try {
-      const response = await axios.post(
-        `${apiUrl}/api/company/create`,
-        { name, info },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await $api.post("/company/create", {
+        name,
+        info,
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -48,20 +40,11 @@ export const fetchCompanyCreate = createAsyncThunk(
 export const fetchUpdateCompany = createAsyncThunk(
   "api/fetchUpdateCompany",
   async ({ companyId, name, info }) => {
-    console.log(companyId, name, info);
     try {
-      const response = await axios.put(
-        `${apiUrl}/api/company/update/${companyId}`,
-        {
-          name,
-          info,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await $api.put(`/company/update/${companyId}`, {
+        name,
+        info,
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -73,14 +56,7 @@ export const fetchDeleteCompany = createAsyncThunk(
   "api/fetchDeleteCompany",
   async (companyId) => {
     try {
-      const response = await axios.delete(
-        `${apiUrl}/api/company/delete/${companyId}`,
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await $api.delete(`/company/delete/${companyId}`);
       return response.data;
     } catch (error) {
       throw error;
@@ -94,20 +70,24 @@ const companySlice = createSlice({
     companies: [],
     status: null,
     error: null,
+    isLoading: false,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
       .addCase(fetchCompanyInfo.pending, (state) => {
         state.status = "loading";
+        state.isLoading = true;
       })
       .addCase(fetchCompanyInfo.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.companies = action.payload.companies;
+        state.isLoading = false;
       })
       .addCase(fetchCompanyInfo.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.error.message;
+        state.isLoading = false;
       })
       .addCase(fetchCompanyCreate.fulfilled, (state, action) => {
         state.companies.push(action.payload.company);

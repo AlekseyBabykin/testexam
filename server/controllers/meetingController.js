@@ -3,7 +3,7 @@ const ApiError = require("../error/ApiError");
 
 class MeetingsController {
   async create(req, res, next) {
-    console.log("req.body=>", req.body);
+    const infoUser = req.user;
     try {
       const {
         companyBusinessId,
@@ -12,7 +12,6 @@ class MeetingsController {
         location,
         business_name,
         summary,
-        salesUserId,
       } = req.body;
 
       const meeting = await Meetings.create({
@@ -22,7 +21,7 @@ class MeetingsController {
         location,
         business_name,
         summary,
-        salesUserId,
+        salesUserId: infoUser.id,
       });
       return res.json({
         message: "The meeting was saved successfully",

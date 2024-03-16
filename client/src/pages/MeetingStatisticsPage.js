@@ -4,6 +4,7 @@ import { Bar } from "react-chartjs-2";
 import { Chart as ChartJS } from "chart.js/auto";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchMeetingsInfo } from "../features/Mettings/apiSliceMeetings";
+
 const MeetingStatisticsPage = () => {
   const meetings = useSelector((state) => state.meeting.meetings);
   const dispatch = useDispatch();
@@ -82,9 +83,13 @@ const MeetingStatisticsPage = () => {
       },
     ],
   };
+
   useEffect(() => {
-    dispatch(fetchMeetingsInfo());
+    if (localStorage.getItem("token")) {
+      dispatch(fetchMeetingsInfo());
+    }
   }, [dispatch]);
+
   return (
     <Container className="mt-5">
       <h1>Meeting Statistics Page</h1>

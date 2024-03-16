@@ -1,23 +1,11 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { jwtDecode } from "jwt-decode";
-
-const apiUrl = process.env.REACT_APP_API_URL || "http://localhost:5000";
-const token = localStorage.getItem("token");
-
-const salesUserId = token ? jwtDecode(token).id : null;
-
-const headers = token ? { Authorization: `Bearer ${token}` } : {};
+import $api from "../../http";
 
 export const fetchMeetingsInfo = createAsyncThunk(
   "api/fetchMeetingsInfo",
   async () => {
     try {
-      const response = await axios.get(`${apiUrl}/api/meeting/info`, {
-        headers: {
-          authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-      });
+      const response = await $api.get("/meeting/info");
       return response.data;
     } catch (error) {
       throw error;
@@ -35,26 +23,15 @@ export const fetchMeetingCreate = createAsyncThunk(
     summary,
     companyBusinessId,
   }) => {
-    const token = localStorage.getItem("token");
-    const salesUserId = token ? jwtDecode(token).id : null;
     try {
-      const response = await axios.post(
-        `${apiUrl}/api/meeting/create`,
-        {
-          details,
-          date,
-          location,
-          business_name,
-          summary,
-          companyBusinessId,
-          salesUserId,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await $api.post("/meeting/create", {
+        details,
+        date,
+        location,
+        business_name,
+        summary,
+        companyBusinessId,
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -65,24 +42,13 @@ export const fetchMeetingCreate = createAsyncThunk(
 export const fetchUpdateMeeting = createAsyncThunk(
   "api/fetchUpdateMeeting",
   async ({ meetingId, details, date, location, summary }) => {
-    const token = localStorage.getItem("token");
-    const salesUserId = token ? jwtDecode(token).id : null;
     try {
-      const response = await axios.put(
-        `${apiUrl}/api/meeting/update/${meetingId}`,
-        {
-          details,
-          date,
-          location,
-          summary,
-          salesUserId,
-        },
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await $api.put(`/meeting/update/${meetingId}`, {
+        details,
+        date,
+        location,
+        summary,
+      });
       return response.data;
     } catch (error) {
       throw error;
@@ -94,14 +60,7 @@ export const fetchDeleteMeeting = createAsyncThunk(
   "api/fetchDeleteMeeting",
   async (meetingId) => {
     try {
-      const response = await axios.delete(
-        `${apiUrl}/api/meeting/delete/${meetingId}`,
-        {
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      );
+      const response = await $api.delete(`/meeting/delete/${meetingId}`);
       return response.data;
     } catch (error) {
       throw error;
